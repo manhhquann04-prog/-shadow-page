@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ SHADOW ELITE ] XÓA MÃ ẨN v5.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        :root {
+            --neon: #00ff9d;
+            --purple: #c026d3;
+            --pink: #ff0088;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'SF Mono', 'Courier New', monospace;
+            background: linear-gradient(180deg, #0a0a0a, #000);
+            color: var(--neon);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #matrix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; opacity: 0.2; }
+
+        .container { position: relative; z-index: 10; max-width: 1350px; margin: 0 auto; padding: 15px; }
+
+        .glitch-title {
+            font-size: 3.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            text-align: center;
+            background: linear-gradient(90deg, #00ff9d, #67e8f9, #c026d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px var(--neon), 0 0 80px var(--purple);
+            animation: glitch 1.5s infinite;
+            margin: 30px 0 10px;
+        }
+
+        @keyframes glitch {
+            0%,100% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(5px, -5px); }
+        }
+
+        .status-bar {
+            background: rgba(15,23,42,0.98);
+            border: 2px solid var(--neon);
+            border-radius: 50px;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin: 25px 0 50px;
+            box-shadow: 0 0 50px rgba(0,255,157,0.4);
+        }
+
+        .input-area {
+            display: flex;
+            max-width: 650px;
+            margin: 0 auto 55px;
+            gap: 18px;
+        }
+        .code-input {
+            flex: 1;
+            padding: 26px 32px;
+            background: #0a0a0a;
+            border: 3px solid var(--neon);
+            border-radius: 9999px;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: 0 0 40px rgba(0,255,157,0.5);
+        }
+        .btn-hack {
+            padding: 26px 70px;
+            background: linear-gradient(90deg, #00ff9d, #67e8f9, #c026d3);
+            color: #000;
+            font-weight: 900;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            box-shadow: 0 0 60px rgba(0,255,157,0.9);
+            transition: 0.4s;
+        }
+        .btn-hack:hover {
+            transform: scale(1.15) rotate(3deg);
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 28px;
+            margin-top: 30px;
+        }
+        .game-item {
+            background: #0f172a;
+            border-radius: 22px;
+            overflow: hidden;
+            border: 2px solid rgba(0,255,157,0.5);
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .game-item:hover {
+            transform: translateY(-20px) scale(1.08);
+            border-color: var(--neon);
+            box-shadow: 0 0 80px rgba(0,255,157,0.8);
+        }
+        .game-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: 0.6s;
+        }
+        .game-item:hover .game-image {
+            transform: scale(1.1);
+        }
+        .game-name {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.55rem;
+            font-weight: bold;
+            background: linear-gradient(145deg, #1e2937, #0f172a);
+            color: #fff;
+        }
+
+        .terminal {
+            margin: 70px auto;
+            max-width: 820px;
+            background: #0a0a0a;
+            border: 2px solid var(--neon);
+            border-radius: 20px;
+            padding: 30px;
+            min-height: 340px;
+            box-shadow: 0 0 80px rgba(0,255,157,0.6);
+            display: none;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 12px; }
+            .glitch-title {
+                font-size: 2rem;
+                letter-spacing: 4px;
+                margin-top: 20px;
+            }
+            .status-bar {
+                padding: 14px 16px;
+                gap: 12px;
+                font-size: 0.85rem;
+                margin-bottom: 30px;
+            }
+            .input-area {
+                flex-direction: column;
+                gap: 12px;
+                margin-bottom: 35px;
+            }
+            .code-input {
+                width: 100%;
+                padding: 20px 22px;
+                font-size: 1rem;
+            }
+            .btn-hack {
+                width: 100%;
+                padding: 20px;
+                font-size: 1.05rem;
+            }
+            .game-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+            .game-image { height: 120px; }
+            .game-name {
+                padding: 12px 6px;
+                font-size: 1rem;
+            }
+            .terminal {
+                margin: 40px auto;
+                padding: 18px;
+                min-height: 280px;
+                overflow-wrap: anywhere;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <div class="container">
+        <div class="glitch-title">[ SHADOW ELITE ]</div>
+        <p style="text-align:center; font-size:1.35rem; margin-bottom:20px; opacity:0.95;">
+            XÓA MÃ ẨN • MAX WIN • ANTI-BAN v5.0
+        </p>
+
+        <div class="status-bar">
+            <span><i class="fas fa-shield-alt"></i> CONNECTION: <strong id="connectionStatus">SECURE</strong></span>
+            <span><i class="fas fa-mobile-alt"></i> Android • Secure</span>
+            <span style="color:#00ff9d;"><i class="fas fa-check-circle"></i> FULL UNLOCKED</span>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="username" class="code-input" placeholder="Nhập tài khoản game...">
+            <button class="btn-hack" onclick="startHack()">
+                <i class="fas fa-bolt"></i> PHÂN TÍCH & HACK
+            </button>
+        </div>
+
+        <div class="game-grid">
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772509683.jpeg" alt="C168"><div class="game-name">C168</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772509892.jpg" alt="MB66"><div class="game-name">MB66</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772509936.jpg" alt="OK9"><div class="game-name">OK9</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772509957.jpg" alt="FLY88"><div class="game-name">FLY88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772509978.jpg" alt="CM88"><div class="game-name">CM88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772509994.jpg" alt="SC88"><div class="game-name">SC88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510014.jpg" alt="U888"><div class="game-name">U888</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510054.jpg" alt="RR88"><div class="game-name">RR88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510089.jpg" alt="HI88"><div class="game-name">HI88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510117.jpg" alt="JUN88"><div class="game-name">JUN88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510137.jpg" alt="J88"><div class="game-name">J88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510163.jpg" alt="GK88"><div class="game-name">GK88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510180.jpg" alt="MM88"><div class="game-name">MM88</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510193.jpg" alt="F8BET"><div class="game-name">F8BET</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510213.jpg" alt="33WIN"><div class="game-name">33WIN</div></div>
+            <div class="game-item"><img class="game-image" src="https://api.xoacode.pro/uploads/banners/banner_1772510234.jpg" alt="HIT"><div class="game-name">HIT</div></div>
+        </div>
+
+        <div id="terminal" class="terminal"></div>
+    </div>
+
+    <script>
+        // Matrix Rain
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        const chars = "01アイウエオ0123456789$#@";
+        const fontSize = 16;
+        let drops = [];
+        let animationTimer = null;
+
+        function resizeMatrix() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.floor(window.innerWidth * dpr);
+            canvas.height = Math.floor(window.innerHeight * dpr);
+            canvas.style.width = window.innerWidth + "px";
+            canvas.style.height = window.innerHeight + "px";
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const columns = Math.ceil(window.innerWidth / fontSize);
+            drops = Array(columns).fill(1);
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(5,5,5,0.08)";
+            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+            ctx.fillStyle = "#00ff9d";
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const y = drops[i] * fontSize;
+                ctx.fillText(
+                    chars[Math.floor(Math.random() * chars.length)],
+                    i * fontSize,
+                    y
+                );
+
+                if (y > window.innerHeight && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        resizeMatrix();
+        animationTimer = setInterval(drawMatrix, 32);
+
+        window.addEventListener('resize', resizeMatrix);
+
+        // Escape user input before placing it into innerHTML.
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char]));
+        }
+
+        let hackTimer = null;
+
+        function startHack() {
+            const input = document.getElementById('username');
+            const user = input.value.trim() || "PLAYER";
+            const safeUser = escapeHTML(user);
+            const term = document.getElementById('terminal');
+
+            // Prevent multiple timers if the button is pressed repeatedly.
+            if (hackTimer !== null) {
+                clearInterval(hackTimer);
+                hackTimer = null;
+            }
+
+            term.style.display = 'block';
+            term.innerHTML =
+                `<strong style="color:#67e8f9">[SHADOW ELITE v5.0]</strong><br><br>`;
+
+            const logs = [
+                `[+] Kết nối server tối mật...`,
+                `[+] Phân tích tài khoản <span style="color:#67e8f9">${safeUser}</span>...`,
+                `[+] Đang mô phỏng quá trình xóa mã ẩn...`,
+                `[+] Kiểm tra trạng thái MAX WIN + BIGWIN...`,
+                `[+] Anti-Ban Shield Level 5: <span style="color:#00ff9d">SIMULATION</span>`,
+                `<br><span style="color:#00ff9d; font-size:1.4rem;">✓ HOÀN TẤT - ĐÂY LÀ GIAO DIỆN MÔ PHỎNG</span>`
+            ];
+
+            let i = 0;
+            hackTimer = setInterval(() => {
+                if (i < logs.length) {
+                    term.insertAdjacentHTML('beforeend', logs[i] + "<br>");
+                    term.scrollTop = term.scrollHeight;
+                    i++;
+                } else {
+                    clearInterval(hackTimer);
+                    hackTimer = null;
+                }
+            }, 650);
+        }
+
+        // Allow Enter to start the demo.
+        document.getElementById('username').addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                startHack();
+            }
+        });
+    </script>
+</body>
+</html>
