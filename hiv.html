@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>Thiên Tool - Xúc Xắc 3 Viên</title>
+    <style>
+        /* ===== RESET & TỐI ƯU ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: #050b1a;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: #fff;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
+        }
+
+        /* ===== IFRAME ===== */
+        iframe {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        /* ===== TOOL CHÍNH ===== */
+        #botWrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            touch-action: none;
+            will-change: transform;
+            transform: translate(12px, 60px) scale(var(--bot-scale, 1)) rotate(var(--bot-rotation, 0deg));
+            transition: opacity 0.25s ease;
+        }
+        #botWrap.hidden-tool {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* ===== PANEL ===== */
+        #botPanel {
+            width: 340px;
+            max-width: 94vw;
+            background: rgba(6, 12, 28, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 16px;
+            padding: 14px 14px 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            cursor: grab;
+            transition: box-shadow 0.15s;
+            touch-action: none;
+        }
+        #botPanel:active {
+            cursor: grabbing;
+        }
+
+        /* ===== HEADER ===== */
+        #botHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .badge {
+            background: rgba(0, 229, 255, 0.06);
+            color: #00e5ff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(0, 229, 255, 0.08);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        #statusDot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00e676;
+            flex-shrink: 0;
+            box-shadow: 0 0 6px #00e67666;
+        }
+
+        /* ===== DÒNG TRẠNG THÁI ===== */
+        #summaryLine {
+            font-size: 10px;
+            font-weight: 700;
+            margin: 6px 0 10px;
+            text-align: center;
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            background: rgba(255, 215, 0, 0.04);
+            padding: 3px 0;
+            border-radius: 6px;
+        }
+
+        /* ===== THÔNG TIN ===== */
+        .info-container {
+            background: rgba(0, 0, 0, 0.20);
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2px 0;
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .val {
+            font-weight: 800;
+            color: #fff;
+            font-size: 13px;
+            letter-spacing: 0.2px;
+        }
+        .val-small {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* ===== INPUT 3 XÚC XẮC ===== */
+        #diceInputs {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .dice-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+        .dice-box label {
+            font-size: 9px;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .dice-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.40);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border-radius: 8px;
+            padding: 8px 4px;
+            text-align: center;
+            outline: none;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 16px;
+            transition: border-color 0.15s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .dice-input:focus {
+            border-color: #00e5ff;
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.08);
+        }
+        .dice-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+        .dice-input::placeholder {
+            color: #4a5568;
+            font-weight: 400;
+            font-size: 13px;
+        }
+
+        /* ===== HÀNG NÚT ===== */
+        .action-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .action-row .btn-clear {
+            flex: 0 0 auto;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            white-space: nowrap;
+        }
+        .action-row .btn-clear:active {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(0.96);
+        }
+        #btnAnalyze {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #00e5ff, #2979ff);
+            color: #fff;
+            border: none;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 2px 10px rgba(41, 121, 255, 0.15);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: 0.5px;
+        }
+        #btnAnalyze:active {
+            transform: scale(0.96);
+            box-shadow: 0 1px 4px rgba(41, 121, 255, 0.20);
+        }
+
+        /* ===== KẾT QUẢ (CHỈ GIỮ DỰ ĐOÁN CUỐI) ===== */
+        #algoResults {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        /* Ẩn 5 dòng thuật toán chi tiết */
+        #algoDetails {
+            display: none;
+        }
+        .algo-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            padding: 2px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
+        }
+        .algo-row:last-child {
+            border-bottom: none;
+        }
+        .algo-name {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .algo-pred {
+            font-weight: 800;
+            padding: 1px 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .algo-pred.tai {
+            color: #00e5ff;
+        }
+        .algo-pred.xiu {
+            color: #ff3d00;
+        }
+        .algo-pred.final {
+            background: rgba(255, 215, 0, 0.12);
+            color: #ffd700;
+            font-size: 13px;
+            padding: 2px 14px;
+        }
+
+        /* ===== LỊCH SỬ ===== */
+        #historyBox {
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            font-size: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            max-height: 130px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #historyBox::-webkit-scrollbar {
+            width: 3px;
+        }
+        #historyBox::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+        }
+
+        .hist-title {
+            color: #64748b;
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .hist-item {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 4px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+        }
+        .hist-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .hist-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .hist-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 4px;
+        }
+
+        .btn-check {
+            flex: 1;
+            padding: 4px 0;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.03);
+            font-size: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s;
+            letter-spacing: 0.2px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-check:active {
+            transform: scale(0.94);
+        }
+        .btn-check.win {
+            color: #00e676;
+            border-color: rgba(0, 230, 118, 0.10);
+        }
+        .btn-check.win:active {
+            background: rgba(0, 230, 118, 0.08);
+        }
+        .btn-check.lose {
+            color: #ff3d00;
+            border-color: rgba(255, 61, 0, 0.10);
+        }
+        .btn-check.lose:active {
+            background: rgba(255, 61, 0, 0.08);
+        }
+
+        #btnViewAll {
+            width: 100%;
+            margin-top: 6px;
+            padding: 5px;
+            border-radius: 6px;
+            background: rgba(0, 229, 255, 0.03);
+            border: 1px solid rgba(0, 229, 255, 0.06);
+            color: #00e5ff;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: background 0.15s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #btnViewAll:active {
+            background: rgba(0, 229, 255, 0.08);
+        }
+
+        /* ===== ĐIỀU KHIỂN ===== */
+        .control-group {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-rotate {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+            padding: 6px 0;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-rotate:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #sizeSlider {
+            flex: 1;
+            height: 3px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+            outline: none;
+            min-width: 40px;
+        }
+        #sizeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #00e5ff;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(0, 229, 255, 0.15);
+        }
+        #sizeSlider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #00e5ff;
+            cursor: pointer;
+        }
+
+        /* ===== NÚT ẨN/HIỆN ===== */
+        #toggleBtn {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(6, 12, 28, 0.70);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10000;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transition: border-color 0.15s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #toggleBtn:active {
+            border-color: rgba(0, 229, 255, 0.20);
+        }
+        #toggleBtn svg {
+            width: 20px;
+            height: 20px;
+            stroke: #fff;
+            stroke-width: 1.8;
+        }
+
+        /* ===== MODAL ===== */
+        #historyModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 10001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            padding: 12px;
+        }
+        #historyModal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: rgba(6, 12, 28, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-top: 1px solid rgba(0, 229, 255, 0.12);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.60);
+            transform: scale(0.94) translateY(8px);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        #historyModal.show .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            flex-shrink: 0;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 700;
+            color: #00e5ff;
+            letter-spacing: 0.3px;
+        }
+        .close-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: none;
+            color: #94a3b8;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.15s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .close-btn:active {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .modal-body {
+            padding: 8px 14px;
+            overflow-y: auto;
+            flex: 1;
+            -webkit-overflow-scrolling: touch;
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 3px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+        }
+
+        .modal-footer {
+            padding: 10px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.12);
+            flex-shrink: 0;
+        }
+        .stat-box {
+            text-align: center;
+        }
+        .stat-lbl {
+            font-size: 8px;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .stat-val {
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .c-total {
+            color: #00e5ff;
+        }
+        .c-win {
+            color: #00e676;
+        }
+        .c-lose {
+            color: #ff3d00;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 420px) {
+            #botPanel {
+                width: 290px;
+                padding: 10px 10px 8px;
+            }
+            .badge {
+                font-size: 9px;
+                padding: 2px 8px;
+            }
+            .info-row {
+                font-size: 10px;
+            }
+            .val {
+                font-size: 12px;
+            }
+            #summaryLine {
+                font-size: 9px;
+                margin: 4px 0 8px;
+            }
+            .dice-input {
+                font-size: 14px;
+                padding: 6px 4px;
+            }
+            .action-row .btn-clear {
+                font-size: 11px;
+                padding: 8px 10px;
+            }
+            #btnAnalyze {
+                font-size: 12px;
+                padding: 8px 0;
+            }
+            #historyBox {
+                padding: 6px;
+                max-height: 110px;
+            }
+            .hist-top {
+                font-size: 10px;
+            }
+            .btn-check {
+                font-size: 7px;
+                padding: 3px 0;
+            }
+            .control-group {
+                gap: 6px;
+            }
+            .btn-rotate {
+                font-size: 8px;
+                padding: 5px 0;
+            }
+            #toggleBtn {
+                width: 38px;
+                height: 38px;
+                bottom: 14px;
+                right: 14px;
+            }
+            #toggleBtn svg {
+                width: 17px;
+                height: 17px;
+            }
+            .modal-header h3 {
+                font-size: 11px;
+            }
+            .stat-val {
+                font-size: 13px;
+            }
+            .algo-row {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            #botPanel {
+                width: 260px;
+                padding: 8px 8px 6px;
+            }
+            .badge {
+                font-size: 8px;
+                padding: 1px 6px;
+            }
+            .info-row {
+                font-size: 9px;
+            }
+            .val {
+                font-size: 11px;
+            }
+            #summaryLine {
+                font-size: 8px;
+            }
+            .dice-input {
+                font-size: 13px;
+                padding: 4px 2px;
+            }
+            .action-row .btn-clear {
+                font-size: 10px;
+                padding: 6px 8px;
+            }
+            #btnAnalyze {
+                font-size: 11px;
+                padding: 6px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NÚT ẨN/HIỆN TOOL ===== -->
+    <div id="toggleBtn" onclick="toggleTool()" aria-label="Ẩn/Hiện tool">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+    </div>
+
+    <!-- ===== MODAL LỊCH SỬ ===== -->
+    <div id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 DỮ LIỆU TOÀN HỆ THỐNG</h3>
+                <button class="close-btn" onclick="toggleModal()">✕</button>
+            </div>
+            <div class="modal-body" id="fullHistContent">
+                <div style="opacity:0.35; font-style:italic; text-align:center; padding:20px 0; font-size:11px;">Chưa có dữ liệu...</div>
+            </div>
+            <div class="modal-footer">
+                <div class="stat-box"><div class="stat-lbl">Tổng</div><div class="stat-val c-total" id="stTotal">0</div></div>
+                <div class="stat-box"><div class="stat-lbl">Chuẩn</div><div class="stat-val c-win" id="stWin">0</div></div>
+                <div class="stat-box"><div class="stat-lbl">Bẻ</div><div class="stat-val c-lose" id="stLose">0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOOL CHÍNH ===== -->
+    <div id="botWrap">
+        <div id="botPanel">
+            <div id="botHeader">
+                <div class="badge">🎲 THIÊN TOOL</div>
+                <div id="statusDot"></div>
+            </div>
+
+            <div id="summaryLine">NHẬP 3 VIÊN XÚC XẮC (1-6)</div>
+
+            <div id="botBody">
+                <div class="info-container">
+                    <div class="info-row"><span>Tổng điểm:</span> <span class="val" id="tongDiem" style="color:#fff;">---</span></div>
+                    <div class="info-row"><span>Kết quả hiện tại:</span> <span class="val" id="ketQuaHienTai" style="color:#00e5ff;">---</span></div>
+                </div>
+
+                <!-- 3 ô nhập xúc xắc (không giá trị mặc định) -->
+                <div id="diceInputs">
+                    <div class="dice-box">
+                        <label>🎲 #1</label>
+                        <input type="number" class="dice-input" id="dice1" min="1" max="6" placeholder="1-6" inputmode="numeric">
+                    </div>
+                    <div class="dice-box">
+                        <label>🎲 #2</label>
+                        <input type="number" class="dice-input" id="dice2" min="1" max="6" placeholder="1-6" inputmode="numeric">
+                    </div>
+                    <div class="dice-box">
+                        <label>🎲 #3</label>
+                        <input type="number" class="dice-input" id="dice3" min="1" max="6" placeholder="1-6" inputmode="numeric">
+                    </div>
+                </div>
+
+                <!-- Hàng nút: XÓA SỐ + PHÂN TÍCH -->
+                <div class="action-row">
+                    <button class="btn-clear" onclick="clearDice()">🗑️ XÓA SỐ</button>
+                    <button id="btnAnalyze" onclick="analyze()">🔮 PHÂN TÍCH DỰ ĐOÁN TIẾP</button>
+                </div>
+
+                <!-- Kết quả (chỉ giữ dòng DỰ ĐOÁN CUỐI) -->
+                <div id="algoResults">
+                    <!-- 5 dòng thuật toán bị ẩn -->
+                    <div id="algoDetails">
+                        <div class="algo-row"><span class="algo-name">📐 Thuật toán 1 (Tổng chẵn/lẻ)</span><span class="algo-pred" id="algo1">---</span></div>
+                        <div class="algo-row"><span class="algo-name">📊 Thuật toán 2 (Tích 3 viên)</span><span class="algo-pred" id="algo2">---</span></div>
+                        <div class="algo-row"><span class="algo-name">📏 Thuật toán 3 (Khoảng cách max-min)</span><span class="algo-pred" id="algo3">---</span></div>
+                        <div class="algo-row"><span class="algo-name">🔄 Thuật toán 4 (Lặp mặt)</span><span class="algo-pred" id="algo4">---</span></div>
+                        <div class="algo-row"><span class="algo-name">⚡ Thuật toán 5 (Tổng mod 2 + bias)</span><span class="algo-pred" id="algo5">---</span></div>
+                    </div>
+                    <!-- Dòng dự đoán cuối -->
+                    <div class="algo-row" style="border-top:1px solid rgba(255,215,0,0.2); margin-top:4px; padding-top:4px;">
+                        <span class="algo-name" style="color:#ffd700; font-weight:800;">🏆 DỰ ĐOÁN CUỐI</span>
+                        <span class="algo-pred final" id="finalPred">---</span>
+                    </div>
+                </div>
+
+                <div id="historyBox">
+                    <div class="hist-title">— Phiên gần nhất —</div>
+                    <div id="histContent">
+                        <div style="opacity:0.35; font-style:italic; text-align:center; padding:4px 0; font-size:10px;">Đang chờ dữ liệu...</div>
+                    </div>
+                    <button id="btnViewAll" onclick="toggleModal()">📋 XEM TOÀN BỘ</button>
+                </div>
+
+                <div class="control-group">
+                    <button class="btn-rotate" onclick="rotateTool()">🔄 XOAY</button>
+                    <input type="range" id="sizeSlider" min="0.5" max="1.2" step="0.05" value="1" aria-label="Kích thước">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LINK GAME ===== -->
+    <iframe src="https://lc79b.bet" loading="lazy"></iframe>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== DOM REFS =====
+            const botWrap = document.getElementById('botWrap');
+            const botPanel = document.getElementById('botPanel');
+            const summaryLine = document.getElementById('summaryLine');
+            const sizeSlider = document.getElementById('sizeSlider');
+            const badgeEl = document.querySelector('.badge');
+            const modal = document.getElementById('historyModal');
+
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+            const dice3 = document.getElementById('dice3');
+            const tongDiem = document.getElementById('tongDiem');
+            const ketQuaHienTai = document.getElementById('ketQuaHienTai');
+            const algo1 = document.getElementById('algo1');
+            const algo2 = document.getElementById('algo2');
+            const algo3 = document.getElementById('algo3');
+            const algo4 = document.getElementById('algo4');
+            const algo5 = document.getElementById('algo5');
+            const finalPred = document.getElementById('finalPred');
+
+            const histContent = document.getElementById('histContent');
+            const fullHistContent = document.getElementById('fullHistContent');
+
+            // ===== BIẾN TRẠNG THÁI =====
+            let rotation = 0;
+            let historyData = [];
+            let systemBias = 0;
+
+            // ===== VỊ TRÍ KÉO THẢ =====
+            let posX = 12,
+                posY = 60;
+            let startPosX = 0,
+                startPosY = 0;
+            let startX = 0,
+                startY = 0;
+            let dragging = false;
+
+            // ===== CẬP NHẬT TRANSFORM =====
+            function updateTransform() {
+                const scale = sizeSlider.value || 1;
+                botWrap.style.transform =
+                    `translate(${posX}px, ${posY}px) scale(${scale}) rotate(${rotation}deg)`;
+            }
+
+            // ===== TOGGLE =====
+            window.toggleTool = function() {
+                botWrap.classList.toggle('hidden-tool');
+            };
+
+            window.toggleModal = function() {
+                modal.classList.toggle('show');
+            };
+
+            // ===== XOAY =====
+            window.rotateTool = function() {
+                rotation += 90;
+                updateTransform();
+            };
+
+            // ===== SLIDER =====
+            sizeSlider.addEventListener('input', updateTransform);
+
+            // ===== KÉO THẢ =====
+            botPanel.addEventListener('pointerdown', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+                e.preventDefault();
+                dragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startPosX = posX;
+                startPosY = posY;
+                botPanel.setPointerCapture(e.pointerId);
+            });
+
+            window.addEventListener('pointermove', function(e) {
+                if (!dragging) return;
+                e.preventDefault();
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                posX = startPosX + dx;
+                posY = startPosY + dy;
+                updateTransform();
+            });
+
+            window.addEventListener('pointerup', function(e) {
+                if (dragging) {
+                    dragging = false;
+                    botPanel.releasePointerCapture(e.pointerId);
+                }
+            });
+
+            window.addEventListener('pointercancel', function(e) {
+                if (dragging) {
+                    dragging = false;
+                    botPanel.releasePointerCapture(e.pointerId);
+                }
+            });
+
+            // ===== LẤY GIÁ TRỊ HỢP LỆ TỪ INPUT =====
+            function getDiceValue(input) {
+                const raw = input.value.trim();
+                if (raw === '') return null;
+                const num = Number(raw);
+                if (isNaN(num) || num < 1 || num > 6) return null;
+                return Math.floor(num);
+            }
+
+            // ===== XÓA SỐ (không xóa lịch sử) =====
+            window.clearDice = function() {
+                dice1.value = '';
+                dice2.value = '';
+                dice3.value = '';
+                // Đặt lại hiển thị
+                tongDiem.textContent = '---';
+                ketQuaHienTai.textContent = '---';
+                ketQuaHienTai.style.color = '#00e5ff';
+                finalPred.textContent = '---';
+                // Không reset các thuật toán vì đã ẩn
+                summaryLine.textContent = '📊 NHẬP 3 VIÊN XÚC XẮC (1-6)';
+                summaryLine.style.color = '#ffd700';
+                // Focus vào ô đầu tiên
+                dice1.focus();
+            };
+
+            // ===== 5 THUẬT TOÁN =====
+            function algorithm1(a, b, c) {
+                const sum = a + b + c;
+                return sum % 2 === 0 ? 'TÀI' : 'XỈU';
+            }
+
+            function algorithm2(a, b, c) {
+                const prod = a * b * c;
+                return prod % 2 === 0 ? 'XỈU' : 'TÀI';
+            }
+
+            function algorithm3(a, b, c) {
+                const max = Math.max(a, b, c);
+                const min = Math.min(a, b, c);
+                const range = max - min;
+                return range >= 3 ? 'TÀI' : 'XỈU';
+            }
+
+            function algorithm4(a, b, c) {
+                if (a === b || b === c || a === c) {
+                    return 'XỈU';
+                } else {
+                    return 'TÀI';
+                }
+            }
+
+            function algorithm5(a, b, c) {
+                const sum = a + b + c;
+                let raw = (sum % 2 === 0) ? 1 : 0;
+                let biased = raw + systemBias * 0.3;
+                return biased > 0.5 ? 'TÀI' : 'XỈU';
+            }
+
+            // ===== HÀM PHÂN TÍCH CHÍNH =====
+            window.analyze = function() {
+                const a = getDiceValue(dice1);
+                const b = getDiceValue(dice2);
+                const c = getDiceValue(dice3);
+
+                if (a === null || b === null || c === null) {
+                    summaryLine.textContent = '⚠️ VUI LÒNG NHẬP ĐỦ 3 SỐ (1-6)';
+                    summaryLine.style.color = '#ff3d00';
+                    return;
+                }
+
+                // Cập nhật giá trị đã hợp lệ
+                dice1.value = a;
+                dice2.value = b;
+                dice3.value = c;
+
+                const sum = a + b + c;
+                tongDiem.textContent = sum;
+                const current = (sum >= 11) ? 'TÀI' : 'XỈU';
+                ketQuaHienTai.textContent = current;
+                ketQuaHienTai.style.color = (current === 'TÀI') ? '#00e5ff' : '#ff3d00';
+
+                // Chạy 5 thuật toán (vẫn tính nhưng không hiển thị)
+                const pred1 = algorithm1(a, b, c);
+                const pred2 = algorithm2(a, b, c);
+                const pred3 = algorithm3(a, b, c);
+                const pred4 = algorithm4(a, b, c);
+                const pred5 = algorithm5(a, b, c);
+
+                // Cập nhật các thẻ ẩn (nếu cần cho debug, nhưng không hiển thị)
+                algo1.textContent = pred1;
+                algo1.className = 'algo-pred ' + (pred1 === 'TÀI' ? 'tai' : 'xiu');
+                algo2.textContent = pred2;
+                algo2.className = 'algo-pred ' + (pred2 === 'TÀI' ? 'tai' : 'xiu');
+                algo3.textContent = pred3;
+                algo3.className = 'algo-pred ' + (pred3 === 'TÀI' ? 'tai' : 'xiu');
+                algo4.textContent = pred4;
+                algo4.className = 'algo-pred ' + (pred4 === 'TÀI' ? 'tai' : 'xiu');
+                algo5.textContent = pred5;
+                algo5.className = 'algo-pred ' + (pred5 === 'TÀI' ? 'tai' : 'xiu');
+
+                // Tổng hợp đa số
+                const votes = [pred1, pred2, pred3, pred4, pred5];
+                const taiCount = votes.filter(v => v === 'TÀI').length;
+                const final = taiCount >= 3 ? 'TÀI' : 'XỈU';
+                finalPred.textContent = final;
+                finalPred.className = 'algo-pred final';
+
+                summaryLine.textContent = `📊 PHÂN TÍCH HOÀN TẤT (${taiCount}/5 chọn TÀI)`;
+                summaryLine.style.color = '#ffd700';
+
+                // Lưu lịch sử
+                const uid = Date.now().toString() + Math.floor(Math.random() * 1000);
+                addHistory({
+                    id: uid,
+                    dice: `${a}-${b}-${c}`,
+                    sum: sum,
+                    current: current,
+                    final: final,
+                    status: 'pending'
+                });
+            };
+
+            // ===== LỊCH SỬ =====
+            function addHistory(item) {
+                historyData.unshift(item);
+                if (historyData.length > 100) historyData.pop();
+                renderAll();
+            }
+
+            window.confirmResult = function(id, isWin) {
+                const entry = historyData.find(function(h) { return h.id === id; });
+                if (!entry) return;
+
+                entry.status = isWin ? 'WIN' : 'LOSE';
+
+                if (!isWin) {
+                    systemBias += (entry.final === 'TÀI') ? -0.8 : 0.8;
+                } else {
+                    systemBias += (entry.final === 'TÀI') ? 0.2 : -0.2;
+                }
+                systemBias = Math.max(-3, Math.min(3, systemBias));
+
+                renderAll();
+
+                summaryLine.textContent = isWin ? '🎯 CHUẨN XÁC' : '🔄 AI HỌC LẠI...';
+                summaryLine.style.color = isWin ? '#00e676' : '#ff3d00';
+                setTimeout(function() {
+                    summaryLine.textContent = '📊 NHẬP 3 VIÊN XÚC XẮC (1-6)';
+                    summaryLine.style.color = '#ffd700';
+                }, 1800);
+            };
+
+            // ===== RENDER =====
+            function renderAll() {
+                renderMain();
+                renderFull();
+                updateStats();
+            }
+
+            function renderMain() {
+                const top3 = historyData.slice(0, 3);
+                histContent.innerHTML = top3.map(function(h) { return buildHistHTML(h); }).join('');
+                if (top3.length === 0) {
+                    histContent.innerHTML = '<div style="opacity:0.35; font-style:italic; text-align:center; padding:4px 0; font-size:10px;">Đang chờ dữ liệu...</div>';
+                }
+            }
+
+            function renderFull() {
+                if (historyData.length === 0) {
+                    fullHistContent.innerHTML = '<div style="opacity:0.35; font-style:italic; text-align:center; padding:20px 0; font-size:11px;">Chưa có dữ liệu...</div>';
+                    return;
+                }
+                fullHistContent.innerHTML = historyData.map(function(h) { return buildHistHTML(h); }).join('');
+            }
+
+            function buildHistHTML(h) {
+                const colorPred = (h.final === 'TÀI') ? '#00e5ff' : '#ff3d00';
+                const colorStatus = (h.status === 'WIN') ? '#00e676' : '#ff3d00';
+
+                return `
+                    <div class="hist-item">
+                        <div class="hist-top">
+                            <span>🎲 ${h.dice} → <b style="color:${colorPred};">${h.final}</b> (Tổng: ${h.sum})</span>
+                            ${h.status !== 'pending' ? `<b style="color:${colorStatus};">${h.status}</b>` : ''}
+                        </div>
+                        ${h.status === 'pending' ? `
+                            <div class="hist-actions">
+                                <button class="btn-check win" onclick="confirmResult('${h.id}', true)">✓ CHUẨN</button>
+                                <button class="btn-check lose" onclick="confirmResult('${h.id}', false)">✕ SAI</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            function updateStats() {
+                const wins = historyData.filter(function(h) { return h.status === 'WIN'; }).length;
+                const loses = historyData.filter(function(h) { return h.status === 'LOSE'; }).length;
+                document.getElementById('stTotal').textContent = historyData.length;
+                document.getElementById('stWin').textContent = wins;
+                document.getElementById('stLose').textContent = loses;
+            }
+
+            // ===== BADGE PING =====
+            setInterval(function() {
+                if (badgeEl) {
+                    badgeEl.textContent = '🎲 THIÊN TOOL • ' + (Math.floor(Math.random() * 25) + 12) + 'ms';
+                }
+            }, 5000);
+
+            // ===== ENTER =====
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && (e.target === dice1 || e.target === dice2 || e.target === dice3)) {
+                    e.preventDefault();
+                    analyze();
+                }
+            });
+
+            // ===== KHỞI TẠO =====
+            updateTransform();
+            summaryLine.textContent = '📊 NHẬP 3 VIÊN XÚC XẮC (1-6)';
+            summaryLine.style.color = '#ffd700';
+        })();
+    </script>
+</body>
+</html>
